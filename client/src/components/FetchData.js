@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import './style.css';
 
 class FetchData extends Component {
 
@@ -19,6 +20,8 @@ class FetchData extends Component {
 
     componentWillMount() {
 
+
+
          axios.get('/api/fetch-data')
              .then(response => {
                  console.log(response.data);
@@ -32,15 +35,21 @@ class FetchData extends Component {
              .catch(function (error) {
                  console.log(error);
              });
-
     }
 
     render() {
         return (<div>
-                    Name: {this.state.name}
-                    Rank: {this.state.rank}
-                    Dimensions: {this.state.dimensions}
-                    Category: {this.state.category}
+                    {
+                        this.state.name === '' ? <div className="loader"></div> :
+
+                        <div className="product-info">
+                            <div>Name: {this.state.name}</div>
+                            <div>Rank: {this.state.rank}</div>
+                            <div>Dimensions: {this.state.dimensions}</div>
+                            <div>Category: {this.state.category}</div>
+                        </div>
+
+                    }
                 </div>)
     }
 
