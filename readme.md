@@ -6,3 +6,8 @@ With an express backend, and using redis as a backend. Also used nodemon (to mon
 
 
 Use `yarn dev` to run the server, uses nodemon to moniter changes to files, and concurrently to run both the react app and node express server at the same time.
+
+
+Redis:
+
+https://github.com/NodeRedis/node_redis

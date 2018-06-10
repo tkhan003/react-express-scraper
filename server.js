@@ -3,35 +3,81 @@ const app = express();
 const port = process.env.PORT || 5000;
 const axios = require('axios');
 const cheerio = require('cheerio');
+const redis = require('redis');
+var redisClient = redis.createClient();
 
-let base_url = 'http://www.amazon.com/dp/B002QYW8LW';
+let productID = 'B079KJ9TCN'
+let base_url = `http://www.amazon.com/dp/${productID}`;
 
-app.get('/api/fetch-data', (req, res) => {
 
-    axios.get(base_url)
+// IN REDIS CLI- TYPE KEYS * TO SEE ALL KEYS
+
+
+function scrape(req, res) {
+
+    return new Promise((resolve, reponse) => {
+      axios.get(base_url)
         .then(function (response) {
+          let $ = cheerio.load(response.data);
+          let name = $('#productTitle').text().trim();
+          let dimensions = $('.size-weight').last().find('.value').text();
+          let category = $('#wayfinding-breadcrumbs_feature_div a').first().text().trim();
+          let rankRaw = $('#SalesRank')
+              .contents()
+              .filter(function () {
+                  return this.nodeType === 3;
+              })[0]
 
-            let $ = cheerio.load(response.data);
-            let name = $('#productTitle').text().trim();
-            let dimensions = $('.size-weight').last().find('.value').text();
-            let category = $('#wayfinding-breadcrumbs_feature_div a').first().text().trim();
-            let rankRaw = $('#SalesRank .value')
-                .contents()
-                .filter(function () {
-                    return this.nodeType === 3;
-                })[0].data.trim().replace('(', '').trim();
+            let rankParsed = !!rankRaw ? rankRaw.data.trim().replace('(', '').trim(): ''
 
-            res.send({
-                name: name,
-                rank: rankRaw,
-                dimensions: dimensions,
-                category: category
-            });
-
+          let productInfo = {
+              name: !!name ? name: '',
+              rank: rankParsed,
+              dimensions: !!dimensions ? dimensions: '',
+              category: !!category ? category: ''
+          }
+          resolve(productInfo);
         })
         .catch(function (error) {
             console.log(error);
         });
+    })
+
+}
+
+
+app.get('/api/fetch-data', (req, res) => {
+
+    redisClient.hlen(productID, function (err, reply) {
+
+    // Doesnt exist - make api call to amazon, then save to db
+    if (reply === 0) {
+
+      scrape(req, res)
+        .then(function(response) {
+            console.log(response);
+
+            redisClient.hmset(productID, response);
+
+            // send to client
+            redisClient.hgetall(productID, function (err, reply) {
+                res.send(reply);
+            });
+
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+
+    }
+
+    else {
+        redisClient.hgetall(productID, function (err, reply) {
+            console.log(reply);
+        });
+    }
+
+  })
 
 });
 
