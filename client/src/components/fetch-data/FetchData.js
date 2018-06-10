@@ -15,29 +15,39 @@ class FetchData extends Component {
 			category: ''
 		}
 
+		this.getDataFromApi = this.getDataFromApi.bind(this);
 
 	}
 
-	componentWillReceiveProps() {
-
-		console.log('triggered');
-
-
+	getDataFromApi() {
 		let searchTerm = this.props.asin;
+		console.log("get data called");
 
-		axios.get(`/api/fetch-data/${searchTerm}`)
-			.then(response => {
-				console.log(response.data);
-				this.setState({
-					name: response.data.name,
-					rank: response.data.rank,
-					dimensions: response.data.dimensions,
-					category: response.data.category,
+		if (!!searchTerm) {
+			axios.get(`/api/fetch-data/${searchTerm}`)
+				.then(response => {
+					console.log(response.data);
+					this.setState({
+						name: response.data.name,
+						rank: response.data.rank,
+						dimensions: response.data.dimensions,
+						category: response.data.category,
+					})
 				})
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
+				.catch(function (error) {
+					console.log(error);
+				});
+		}
+
+	}
+
+
+	componentWillMount() {
+		this.getDataFromApi();
+	}
+
+	componentWillReceiveProps() {
+		this.getDataFromApi();
 	}
 
 	render() {

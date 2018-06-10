@@ -11,3 +11,8 @@ Use `yarn dev` to run the server, uses nodemon to moniter changes to files, and 
 Redis:
 
 https://github.com/NodeRedis/node_redis
+
+
+Watch SCSS:
+
+Run `npm run watch-css` from client directory, to watch all .scss files, and complile to css

@@ -11,11 +11,13 @@ class Form extends Component {
     this.state = {
       value: '',
       notEmptyInput: false,
+      submitForm: false,
       searchTerm: ''
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleEnter = this.handleEnter.bind(this);
 
   }
 
@@ -23,24 +25,53 @@ class Form extends Component {
   handleChange(e) {
 
     let userTyped = e.target.value;
-    //   let inputNotEmpty = !!this.state.userTyped.trim().length && !!userTyped && notEmptyInput;
 
     this.setState({
-      // notEmptyInput: true,
       value: userTyped
     });
 
+    if (e.target.value !== '') {
+      this.setState({
+        value: userTyped,
+        notEmptyInput: true
+      });
+    }
+    else {
+      this.setState({
+        notEmptyInput: false
+      });
+    }
+
+  }
+
+  handleEnter(e) {
+
+     if ((e.keyCode == 13 || e.which == 13) && !!e.target.value) {
+       this.setState({
+        submitForm: true,
+        notEmptyInput: true,
+        searchTerm: this.state.value
+       });
+     }
+     else {
+      this.setState({
+        submitForm: false
+      });
+     }
   }
 
   handleClick(e) {
     console.log("clickced");
     // let inputNotEmpty = !!this.state.userTyped.trim().length && !!userTyped && notEmptyInput;
-
+    if (!!this.state.notEmptyInput) {
+      this.setState({
+        notEmptyInput: true,
+        submitForm: true,
+        searchTerm: this.state.value
+      });
+    }
     // if (inputNotEmpty) {
-    this.setState({
-      notEmptyInput: true,
-      searchTerm: this.state.value
-    });
+
     // }
   }
 
@@ -51,10 +82,10 @@ class Form extends Component {
         <div className = "inner-box" >
         <h1> Product Search </h1>
         < div className = "label" > ASIN </div>
-        <input className = "custominput" value = { this.state.value} onChange = { this.handleChange} placeholder="ex: B002QYW8LW"/>
+        <input className = "custominput" value = { this.state.value} onChange = { this.handleChange} onKeyDown={this.handleEnter} placeholder="ex: B002QYW8LW"/>
         <button className = "custombutton" type = "button" onClick = { this.handleClick} > Submit </button>
           {
-            !!this.state.notEmptyInput &&
+            !!this.state.notEmptyInput && !!this.state.submitForm &&
             <FetchData asin={this.state.searchTerm} />
           }
           </div>
