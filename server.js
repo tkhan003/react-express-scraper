@@ -6,14 +6,13 @@ const cheerio = require('cheerio');
 const redis = require('redis');
 var redisClient = redis.createClient();
 
-let productID = 'B079KJ9TCN'
-let base_url = `http://www.amazon.com/dp/${productID}`;
+// let productID = 'B079KJ9TCN'
+// let base_url = `http://www.amazon.com/dp/${productID}`;
 
 
 // IN REDIS CLI- TYPE KEYS * TO SEE ALL KEYS
 
-
-function scrape(req, res) {
+function scrape(req, res, base_url) {
 
     return new Promise((resolve, reponse) => {
       axios.get(base_url)
@@ -46,14 +45,17 @@ function scrape(req, res) {
 }
 
 
-app.get('/api/fetch-data', (req, res) => {
+app.get('/api/fetch-data/:pid', (req, res) => {
+
+    let productID = req.params.pid
+    let base_url = `http://www.amazon.com/dp/${productID}`;
 
     redisClient.hlen(productID, function (err, reply) {
 
     // Doesnt exist - make api call to amazon, then save to db
     if (reply === 0) {
 
-      scrape(req, res)
+      scrape(req, res, base_url)
         .then(function(response) {
             console.log(response);
 
@@ -74,6 +76,7 @@ app.get('/api/fetch-data', (req, res) => {
     else {
         redisClient.hgetall(productID, function (err, reply) {
             console.log(reply);
+            res.send(reply);
         });
     }
 
