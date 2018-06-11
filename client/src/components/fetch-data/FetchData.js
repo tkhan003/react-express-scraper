@@ -9,6 +9,7 @@ class FetchData extends Component {
 		super(props)
 
 		this.state = {
+			errorWhileFetching: '',
 			name: '',
 			rank: '',
 			dimensions: '',
@@ -26,16 +27,26 @@ class FetchData extends Component {
 		if (!!searchTerm) {
 			axios.get(`/api/fetch-data/${searchTerm}`)
 				.then(response => {
+					// console.log("hi");
 					console.log(response.data);
-					this.setState({
-						name: response.data.name,
-						rank: response.data.rank,
-						dimensions: response.data.dimensions,
-						category: response.data.category,
-					})
+
+					if (response.data.status === 404) {
+						this.setState({errorWhileFetching: true});
+					}
+					else {
+						this.setState({
+							name: response.data.name,
+							rank: response.data.rank,
+							dimensions: response.data.dimensions,
+							category: response.data.category,
+						})
+					}
+
 				})
 				.catch(function (error) {
-					console.log(error);
+					console.log("stuf");
+					// console.log(error);
+					// console.log(error.respons.status);
 				});
 		}
 
@@ -54,22 +65,30 @@ class FetchData extends Component {
 		return (
 			<div>
 			{
-				this.state.name === '' ? < div className = "loader" > </div> :
 
-				<div className = "product-info">
-					<div>
-						Name : {this.state.name}
-					</div>
-					<div>
-						Rank: {this.state.rank}
-					</div>
-					<div>
-						Dimensions: {this.state.dimensions}
-					</div>
-					<div>
-						Category: {this.state.category}
-					</div>
-				</div>
+				( (!!this.props.submitForm) && (this.state.errorWhileFetching === true) ) ?
+
+
+					<div style = {{ paddingTop: '10px', fontSize: '10px', color: 'red'}}>*Product not found, try again, ensure valid ASIN number</div> :
+
+					this.state.name === '' ?
+
+						(<div className="overlay"><div className="loader"></div></div>) :
+
+						(<div className = "product-info">
+							<div>
+								Name : {this.state.name}
+							</div>
+							<div>
+								Rank: {this.state.rank}
+							</div>
+							<div>
+								Dimensions: {this.state.dimensions}
+							</div>
+							<div>
+								Category: {this.state.category}
+							</div>
+						</div>)
 
 			}
 			</div>)

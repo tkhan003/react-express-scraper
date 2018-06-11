@@ -10,13 +10,15 @@ var redisClient = redis.createClient();
 // let base_url = `http://www.amazon.com/dp/${productID}`;
 
 
-// IN REDIS CLI- TYPE KEYS * TO SEE ALL KEYS
-
 function scrape(req, res, base_url) {
 
-    return new Promise((resolve, reponse) => {
+    return new Promise((resolve, reject) => {
       axios.get(base_url)
         .then(function (response) {
+
+            console.log("===SUCESSFULY SCRAPED===");
+
+            // PARSE DATA FROM RESPONSE IF VALID URL
           let $ = cheerio.load(response.data);
           let name = $('#productTitle').text().trim();
           let dimensions = $('.size-weight').last().find('.value').text();
@@ -38,7 +40,10 @@ function scrape(req, res, base_url) {
           resolve(productInfo);
         })
         .catch(function (error) {
-            console.log(error);
+            console.log("===ERROR WHILE SCRAPED===");
+            console.log(error.response.status);
+            console.log("======");
+            reject(error.response.status);
         });
     })
 
@@ -50,14 +55,17 @@ app.get('/api/fetch-data/:pid', (req, res) => {
     let productID = req.params.pid
     let base_url = `http://www.amazon.com/dp/${productID}`;
 
+    console.log(`SEARCH ID ====> ${productID}`);
+
     redisClient.hlen(productID, function (err, reply) {
 
-    // Doesnt exist - make api call to amazon, then save to db
-    if (reply === 0) {
+      // Doesnt exist - make api call to amazon, then save to db
 
-      scrape(req, res, base_url)
-        .then(function(response) {
-            console.log(response);
+      if (reply === 0) {
+
+        scrape(req, res, base_url)
+          .then(function(response) {
+            console.log('scrape promise CALLBACK HOLLA');
 
             redisClient.hmset(productID, response);
 
@@ -65,21 +73,30 @@ app.get('/api/fetch-data/:pid', (req, res) => {
             redisClient.hgetall(productID, function (err, reply) {
                 res.send(reply);
             });
-
-        })
-        .catch(function(error) {
+          })
+          .catch(function(error) {
+            console.log("//=======SCRAPE PROMISE RETURNED ERROR======")
             console.log(error);
-        });
+            res.send({
+              message: "Error from calling scraping function",
+              status: error
+              });
+            });
 
-    }
+      }
 
-    else {
+      else {
+
+        console.log('ALREADY EXISTS IN DB');
+
         redisClient.hgetall(productID, function (err, reply) {
-            console.log(reply);
-            res.send(reply);
+          res.send(reply);
+          console.log("=======DIDNT HAVE TO SCRAPE, FETCHED THE FOLLOWING FROM FROM REDIS DB======");
+          console.log(reply);
+          console.log("=========================================================");
         });
-    }
 
+      }
   })
 
 });
