@@ -10,6 +10,18 @@ body .loader {
   margin: auto;
   margin-top: 10px; }
 
+.product-info {
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-top: 45px; }
+  .product-info .value-container .heading {
+    font-weight: bold;
+    border-bottom: 1px solid black; }
+  .product-info .value-container .value {
+    padding: 10px;
+    margin-bottom: 10px;
+    min-height: 20px; }
+
 @keyframes spin {
   0% {
     transform: rotate(0deg); }

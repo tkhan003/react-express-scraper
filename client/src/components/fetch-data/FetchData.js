@@ -76,18 +76,28 @@ class FetchData extends Component {
 						(<div className="overlay"><div className="loader"></div></div>) :
 
 						(<div className = "product-info">
-							<div>
-								Name : {this.state.name}
+
+							<div style={{marginBottom: '25px'}}>Product Found: </div>
+							<div className="value-container">
+								<div className="heading">Name:</div>
+								<div className="value">{this.state.name}</div>
 							</div>
-							<div>
-								Rank: {this.state.rank}
+
+							<div className="value-container">
+								<div className="heading">Rank:</div>
+								<div className="value">{this.state.rank}</div>
 							</div>
-							<div>
-								Dimensions: {this.state.dimensions}
+
+							<div className="value-container">
+								<div className="heading">Dimensions:</div>
+								<div className="value">{this.state.dimensions}</div>
 							</div>
-							<div>
-								Category: {this.state.category}
+
+							<div className="value-container">
+								<div className="heading">Category:</div>
+								<div className="value">{this.state.category}</div>
 							</div>
+
 						</div>)
 
 			}
