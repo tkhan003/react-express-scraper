@@ -44,9 +44,7 @@ class FetchData extends Component {
 
 				})
 				.catch(function (error) {
-					console.log("stuf");
-					// console.log(error);
-					// console.log(error.respons.status);
+					console.log(error);
 				});
 		}
 

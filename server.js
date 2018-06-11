@@ -32,10 +32,10 @@ function scrape(req, res, base_url) {
             let rankParsed = !!rankRaw ? rankRaw.data.trim().replace('(', '').trim(): ''
 
           let productInfo = {
-              name: !!name ? name: '',
-              rank: rankParsed,
-              dimensions: !!dimensions ? dimensions: '',
-              category: !!category ? category: ''
+              name: !!name ? name: 'Not Available',
+              rank: !!rankParsed ? rankParsed : 'Not Available',
+              dimensions: !!dimensions ? dimensions : 'Not Available',
+              category: !!category ? category : 'Not Available'
           }
           resolve(productInfo);
         })
