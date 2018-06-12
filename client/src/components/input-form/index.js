@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import FetchData from '../fetch-data/FetchData';
+import FetchData from './children/fetch-data';
 import './style.css'
 
-class Form extends Component {
+class Inputform extends Component {
 
   constructor(props) {
 
@@ -51,7 +51,7 @@ class Form extends Component {
 
   handleEnter(e) {
 
-     if ((e.keyCode == 13 || e.which == 13) && !!e.target.value) {
+     if ((e.keyCode === 13 || e.which === 13) && !!e.target.value) {
        this.setState({
         submitForm: true,
         notEmptyInput: true,
@@ -117,5 +117,5 @@ class Form extends Component {
 
 }
 
-export default Form;
+export default Inputform;
 
